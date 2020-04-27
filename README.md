@@ -15,17 +15,17 @@ A repo storing code written for class with permissions of the instructors.
 *Note: I skipped CSC108, hence why it is missing from this repository*
 
 **Folder Contents:**
-- `test_group_hierarchy.py` &rarr; A collection of pytest test I wrote for an
+- `test_group_hierarchy.py` &rarr; A collection of `pytest` tests I wrote for an
  assignment in this course. I used Test Driven Design to write tests for a 
  complex class structure prior to starting on implementing the code.
 
  
  
 ## Academic Integrity
-Before posting code in this repo, I recieved permission from the instructor.
+Before posting code in this repo, I received permission from the instructor.
 I've also ensured that my code is not vulnerable to re-use, in case a student
 with a similar assignment attempts to plagiarize my work in the future. I took 3
-main precotions:
+main precautions:
 
  - **Branches**: I use the `pseudo-master` branch as default to prevent this repo
 from appearing in search results, for good measure.
