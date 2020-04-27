@@ -9,9 +9,9 @@ from copy import deepcopy
 
 # ======================== Helper Functions ========================
 
-def __eq__employee(e1: Member, e2: Member) -> bool:
+def __eq__member(e1: Member, e2: Member) -> bool:
     """
-    Compares two employees, recursively comparing subordinates for equality, if needed.
+    Compares two members, recursively comparing subordinates for equality, if needed.
     """
     eid_eq = e1.eid == e2.eid
     name_eq = e1.name == e2.name
@@ -19,14 +19,14 @@ def __eq__employee(e1: Member, e2: Member) -> bool:
     wage_eq = e1.wage == e2.wage
     rating_eq = e1.rating == e2.rating
     # if e1._superior is not None or e1._superior is not None:
-    #     sup_eq = __eq__employee(e1._superior, e2._superior)
+    #     sup_eq = __eq__member(e1._superior, e2._superior)
     # else:
     #     sup_eq = True
     length = len(e1._subordinates)
     sub_eq = length == len(e2._subordinates)
     if sub_eq and length > 0:
         for i in range(length):
-            if not __eq__employee(e1._subordinates[i], e2._subordinates[i]):
+            if not __eq__member(e1._subordinates[i], e2._subordinates[i]):
                 return False
     return eid_eq and name_eq and position_eq and wage_eq and rating_eq # and sup_eq
 
@@ -67,9 +67,9 @@ def test_t1_merge_mix() -> None:
     assert merge(sorted(l1), sorted(l2)) == [1, 2, 2, 3, 4, 5, 8, 12, 15]
 
 
-# Test create_organization_from_file
-def test_t6_create_organization_from_file_sample() -> None:
-    o = create_organization_from_file(open('employees.txt'))
+# Test create_group_from_file
+def test_t6_create_group_from_file_sample() -> None:
+    o = create_group_from_file(open('members.txt'))
     assert isinstance(o, grouping)
     assert isinstance(o._head, Leader), "failed to recognize head as a leader"
     assert o._head.name == 'Alice'
@@ -77,38 +77,38 @@ def test_t6_create_organization_from_file_sample() -> None:
     assert o._head.wage == 250000
     assert o._head.rating == 20
     assert o._head._department_name == "Some Corp."
-    e2 = o.get_employee(2)
+    e2 = o.get_member(2)
     assert e2.name == 'Dave' and e2.position == 'CFO' and e2.wage == 150000 and e2.rating == 30 \
         and e2._department_name == 'Finance' and isinstance(e2, Leader) and e2.get_superior().eid == 1
-    e8 = o.get_employee(8)
+    e8 = o.get_member(8)
     assert e8.name == 'Carol' and e8.position == 'Secretary' and e8.wage == 60000 and e8.rating == 40 \
         and e8.get_department_name() == 'Some Corp.' and not isinstance(e8, Leader) and e8.get_superior().eid == 1
-    e9 = o.get_employee(9)
+    e9 = o.get_member(9)
     assert e9.name == 'Fred' and e9.position == 'Hiring Manager' and e9.wage == 60000 and e9.rating == 10 \
         and e9.get_department_name() == 'Human Resources' and not isinstance(e9, Leader) and \
         e9.get_superior().eid == 5 and e9.get_all_subordinates() == []
-    e13 = o.get_employee(13)
+    e13 = o.get_member(13)
     assert e13.name == 'Kevin' and e13.position == 'Programmer' and e13.wage == 40000 and e13.rating == 80 \
         and e13.get_department_name() == 'Technology' and not isinstance(e13, Leader) and \
-        e13.get_superior().eid == 12 and o.get_employee(12).get_superior().eid == 10 and \
+        e13.get_superior().eid == 12 and o.get_member(12).get_superior().eid == 10 and \
         e13.get_all_subordinates() == []
-    e11 = o.get_employee(11)
+    e11 = o.get_member(11)
     assert e11.name == 'Joe' and e11.position == 'Programmer' and e11.wage == 60000 and e11.rating == 90 \
         and e11.get_department_name() == 'Technology' and not isinstance(e11, Leader) and \
-        e11.get_superior().eid == 12 and o.get_employee(12).get_superior().eid == 10 and \
-        o.get_employee(10).get_superior().eid == 1 and e11.get_all_subordinates()[0].eid == 15
+        e11.get_superior().eid == 12 and o.get_member(12).get_superior().eid == 10 and \
+        o.get_member(10).get_superior().eid == 1 and e11.get_all_subordinates()[0].eid == 15
 
 
-def test_t6_create_organization_from_file_empty() -> None:
+def test_t6_create_group_from_file_empty() -> None:
     FILE = StringIO('')
-    o = create_organization_from_file(FILE)
+    o = create_group_from_file(FILE)
     assert isinstance(o, grouping)
     assert o._head is None
 
 
-def test_t6_create_organization_from_file_one_employee() -> None:
+def test_t6_create_group_from_file_one_member() -> None:
     FILE = '25,Fred,Chef du Rien,50,1'
-    o = create_organization_from_file(StringIO(FILE))
+    o = create_group_from_file(StringIO(FILE))
     assert isinstance(o, grouping)
     assert isinstance(o._head, Member) and not isinstance(o._head, Leader)
     assert o._head.eid == 25 and  o._head.name == "Fred" and  o._head.position == "Chef du Rien" and \
@@ -116,9 +116,9 @@ def test_t6_create_organization_from_file_one_employee() -> None:
     assert o._head.get_superior() is None and o._head.get_all_subordinates() == []
 
 
-def test_t6_create_organization_from_file_one_leader() -> None:
+def test_t6_create_group_from_file_one_leader() -> None:
     FILE = '25,Fred,Chef du Rien,50,1,,La Crotte Corporation'
-    o = create_organization_from_file(StringIO(FILE))
+    o = create_group_from_file(StringIO(FILE))
     assert isinstance(o, grouping)
     assert isinstance(o._head, Leader)
     assert o._head.eid == 25 and o._head.name == "Fred" and  o._head.position == "Chef du Rien" and \
@@ -126,8 +126,8 @@ def test_t6_create_organization_from_file_one_leader() -> None:
     assert o._head.get_superior() is None and o._head.get_all_subordinates() == []
 
 
-def test_t6_create_organization_from_file_mutlilevel_departments() -> None:
-    """ This method tests for an organization with multiple levels of department"""
+def test_t6_create_group_from_file_mutlilevel_departments() -> None:
+    """ This method tests for an group with multiple levels of department"""
     # Please, if you read the following file, appreciate the intricacy of the plot (draw it out) :) ;) :O
     FILE = """
     1,Bill,President,200000,60,,White House\n
@@ -139,35 +139,35 @@ def test_t6_create_organization_from_file_mutlilevel_departments() -> None:
     9,Codey Mon Key,Private Server Supervisor,20000,95,5\n
     30,Sandy Smith,Comms Intern,15000,75,20
     """
-    o = create_organization_from_file(StringIO(FILE))
+    o = create_group_from_file(StringIO(FILE))
     assert isinstance(o, grouping)
-    e1 = o.get_employee(1)
+    e1 = o.get_member(1)
     assert e1.name == 'Bill' and e1.position == 'President' and e1.wage == 200000 and e1.rating == 60 \
         and e1.get_department_name() == 'White House' and isinstance(e1, Leader) and e1.get_superior() is None
-    e2 = o.get_employee(2)
+    e2 = o.get_member(2)
     assert e2.name == 'Hillary' and e2.position == 'Secretary of State' and e2.wage == 100000 and e2.rating == 5 \
         and e2.get_department_name() == 'State Dept' and isinstance(e2, Leader) and e2.get_superior().eid == 1
-    e10 = o.get_employee(10)
+    e10 = o.get_member(10)
     assert e10.name == 'Monica Lewinsky' and e10.position == 'Secretary' and \
            e10.wage == 60000\
         and e10.rating == 100 and e10.get_department_name() == 'White House' and not isinstance(e10, Leader) \
         and e10.get_superior().eid == 1
-    e5 = o.get_employee(5)
+    e5 = o.get_member(5)
     assert e5.name == 'Priv ate Server' and e5.position == 'IT Head' and e5.wage == 80000 and e5.rating == 40 \
         and e5.get_department_name() == 'IT Dept' and isinstance(e5, Leader) and e5.get_superior().eid == 2
-    e7 = o.get_employee(7)
+    e7 = o.get_member(7)
     assert e7.name == 'Ben Ghazi' and e7.position == 'Guard' and e7.wage == 30000 \
         and e7.rating == 1 and e7.get_department_name() == 'State Dept' and not isinstance(e7, Leader) \
         and e7.get_superior().eid == 2
-    e20 = o.get_employee(20)
+    e20 = o.get_member(20)
     assert e20.name == 'Gho Stpen' and e20.position == 'Communications Chair' and e20.wage == 50000 and \
         e20.rating == 70 and e20.get_department_name() == 'Communications Dept' and isinstance(e20, Leader) and \
         e20.get_superior().eid == 10
-    e9 = o.get_employee(9)
+    e9 = o.get_member(9)
     assert e9.name == 'Codey Mon Key' and e9.position == 'Private Server Supervisor' and e9.wage == 20000 \
         and e9.rating == 95 and e9.get_department_name() == 'IT Dept' and not isinstance(e9, Leader) \
         and e9.get_superior().eid == 5
-    e30 = o.get_employee(30)
+    e30 = o.get_member(30)
     assert e30.name == 'Sandy Smith' and e30.position == 'Comms Intern' and \
            e30.wage == 15000 \
         and e30.rating == 75 and e30.get_department_name() == 'Communications Dept' and not isinstance(e30, Leader) \
@@ -219,7 +219,7 @@ def test_t1___lt__gt() -> None:
     assert not ret
 
 
-# Test get_direct_subordinates and get_all_subordinates and get_organization_head
+# Test get_direct_subordinates and get_all_subordinates and get_group_head
 def test_t1_subordinates_and_head_simple() -> None:
     e1 = Member(1, 'emp1', 'Director', 15.00, 1)
     e2 = Member(20, "Bob The Builder", 'Construction Member', 8.00, 100)
@@ -237,12 +237,12 @@ def test_t1_subordinates_and_head_simple() -> None:
     assert e2.get_all_subordinates() == [e3]
     assert e3.get_direct_subordinates() == [], "Fails when there are no subordinates"
     assert e3.get_all_subordinates() == [], "Fails when there are no subordinates"
-    assert e3.get_organization_head() == e1
-    assert e2.get_organization_head() == e1
-    assert e1.get_organization_head() == e1, "fails when called on the head"
+    assert e3.get_group_head() == e1
+    assert e2.get_group_head() == e1
+    assert e1.get_group_head() == e1, "fails when called on the head"
 
 
-# Test get_direct_subordinates and get_all_subordinates and get_employee and get_employees_paid_more_than
+# Test get_direct_subordinates and get_all_subordinates and get_member and get_members_paid_more_than
 def test_t1_subordinates_and_head_and_get_and_paidmorethan__large() -> None:
     # depends on a working become_subordinate method
     e8 = Member(1, 'emp1', 'Director', 15.00, 1)
@@ -295,29 +295,29 @@ def test_t1_subordinates_and_head_and_get_and_paidmorethan__large() -> None:
     assert e3.get_direct_subordinates() == []
     assert e3.get_all_subordinates() == []
     # Check Head -- simplified
-    assert e3.get_organization_head() == e7
-    assert e2.get_organization_head() == e7
-    assert e9.get_organization_head() == e7
-    assert e5.get_organization_head() == e7
-    assert e7.get_organization_head() == e7, "fails when called on the head"
-    # Check get_employee
-    assert e7.get_employee(90) == e2, "fails for target on same row"
-    assert e8.get_employee(40) is None, "fails for target 1 row above"
-    assert e8.get_employee(70) is None, "fails for target 2 rows above"
-    assert e8.get_employee(1) == e8, "fails for target that is self"
-    assert e7.get_employee(50) == e5, "fails for target in lateral subtree"
-    assert e8.get_employee(30) is None, "fails for target in lateral subtree and below"
-    assert e7.get_employee(1) == e8, "fails for target 2 rows below"
-    assert e5.get_employee(30) == e3, "fails for target directly below"
-    assert e7.get_employee(100) is None, "fails when target not in organization"
-    # Check get_employees_paid_more_than
-    assert e7.get_employees_paid_more_than(15.00) == [e3, e4, e5, e2], "failed implementation -- note that e8 does not" \
+    assert e3.get_group_head() == e7
+    assert e2.get_group_head() == e7
+    assert e9.get_group_head() == e7
+    assert e5.get_group_head() == e7
+    assert e7.get_group_head() == e7, "fails when called on the head"
+    # Check get_member
+    assert e7.get_member(90) == e2, "fails for target on same row"
+    assert e8.get_member(40) is None, "fails for target 1 row above"
+    assert e8.get_member(70) is None, "fails for target 2 rows above"
+    assert e8.get_member(1) == e8, "fails for target that is self"
+    assert e7.get_member(50) == e5, "fails for target in lateral subtree"
+    assert e8.get_member(30) is None, "fails for target in lateral subtree and below"
+    assert e7.get_member(1) == e8, "fails for target 2 rows below"
+    assert e5.get_member(30) == e3, "fails for target directly below"
+    assert e7.get_member(100) is None, "fails when target not in group"
+    # Check get_members_paid_more_than
+    assert e7.get_members_paid_more_than(15.00) == [e3, e4, e5, e2], "failed implementation -- note that e8 does not" \
                                                                        "qualify since 15.00 is NOT < 15.00"
-    assert e7.get_employees_paid_more_than(7.99) == [e8, e9, e3, e4, e5, e6, e7, e1, e2]
-    assert e7.get_employees_paid_more_than(32.00) == []
-    assert e8.get_employees_paid_more_than(7.99) == [e8]
-    assert e8.get_employees_paid_more_than(15.00) == []
-    assert e1.get_employees_paid_more_than(19.00) == [e3, e5]
+    assert e7.get_members_paid_more_than(7.99) == [e8, e9, e3, e4, e5, e6, e7, e1, e2]
+    assert e7.get_members_paid_more_than(32.00) == []
+    assert e8.get_members_paid_more_than(7.99) == [e8]
+    assert e8.get_members_paid_more_than(15.00) == []
+    assert e1.get_members_paid_more_than(19.00) == [e3, e5]
 
 
 # Test get_superior
@@ -365,8 +365,8 @@ def test_t1_become_subordinate() -> None:
     e2_copy = deepcopy(e2)
     e2.become_subordinate(e1)
     assert id(e2.get_superior()) == id(e1), "Your function improperly assigns the superior"
-    assert __eq__employee(e2.get_superior(), e1), "Your function improperly assigns the superior"
-    assert __eq__employee(e2_copy, e2), "Your function improperly mutates superior"
+    assert __eq__member(e2.get_superior(), e1), "Your function improperly assigns the superior"
+    assert __eq__member(e2_copy, e2), "Your function improperly mutates superior"
     assert id(e1.get_direct_subordinates()[0]) == id(e2), "Your function failed to mutate the superior's " \
                                                           "_subordinates attribute"
 
@@ -378,7 +378,7 @@ def test_t1_become_subordinate_switch() -> None:
     e3 = Member(30, "Don the Doorman", 'Hospitality Member', 16.00, 100)
     e2.become_subordinate(e1)
     assert id(e2.get_superior()) == id(e1), "Your function improperly assigns the superior"
-    assert __eq__employee(e2.get_superior(), e1), "Your function improperly assigns the superior"
+    assert __eq__member(e2.get_superior(), e1), "Your function improperly assigns the superior"
     assert id(e1.get_direct_subordinates()[0]) == id(e2), "Your function failed to mutate the superior's " \
                                                           "_subordinates attribute"
     e2.become_subordinate(e3)
@@ -400,7 +400,7 @@ def test_t1_remove_subordinate_id_only() -> None:
     assert e2.get_direct_subordinates() == []
     assert e1.get_all_subordinates() == [e2]
     assert e1.get_direct_subordinates() == [e2]
-    assert e3._superior == e2, "You should NOT change the employee with eid <eid>'s superior"
+    assert e3._superior == e2, "You should NOT change the member with eid <eid>'s superior"
 
 
 def test_t1_remove_subordinate_id_position() -> None:
@@ -432,12 +432,12 @@ def test_t1_add_subordinate() -> None:
     assert e1.get_direct_subordinates() == [e2, e3], "does not work when >=1 subordinate to <self> already exists"
 
 
-# Test get_employees_paid_more_than -- more above!
-def test_t1_get_employees_paid_more_than_just_one() -> None:
+# Test get_members_paid_more_than -- more above!
+def test_t1_get_members_paid_more_than_just_one() -> None:
     e1 = Member(1, 'emp1', 'Director', 15.00, 1)
-    assert e1.get_employees_paid_more_than(14.00) == [e1]
-    assert e1.get_employees_paid_more_than(15.00) == []
-    assert e1.get_employees_paid_more_than(16.00) == []
+    assert e1.get_members_paid_more_than(14.00) == [e1]
+    assert e1.get_members_paid_more_than(15.00) == []
+    assert e1.get_members_paid_more_than(16.00) == []
 
 
 # TODO: Compile correct list of Task 1 functions from client_code and write appropriate tests
@@ -448,7 +448,7 @@ def test_t1_get_employees_paid_more_than_just_one() -> None:
 # Test get_department_name and get_position_in_hierarchy
 def test_t2_get_department_name_and_position_none() -> None:
     e8 = Member(1, 'emp1', 'Director', 15.00, 1)
-    assert e8.get_department_name() == '', "fails when the employee is not part of a department"
+    assert e8.get_department_name() == '', "fails when the member is not part of a department"
     assert e8.get_position_in_hierarchy() == 'Director'
 
 
@@ -542,7 +542,7 @@ def test_t3_get_department_leader() -> None:
     e3.become_subordinate(e5)
     # Check - get_department_leader
     assert e8.get_department_leader() == e7
-    assert e10.get_department_leader() is None, "Fails when employee is not in a dept"
+    assert e10.get_department_leader() is None, "Fails when member is not in a dept"
     assert e7.get_department_leader() == e7
     assert e9.get_department_leader() == e9, "Fails for sub-department head"
     assert e3.get_department_leader() == e5
@@ -605,7 +605,7 @@ def test_t4_get_highest_rated_subordinate_and_swap_up() -> None:
     assert e1.get_highest_rated_subordinate() == e5
     # Check - swap_up
     e3 = e3.swap_up()
-    e5 = e7.get_employee(50)
+    e5 = e7.get_member(50)
     assert isinstance(e3, Leader), "Bad Implementation: Class should now be leader"
     assert isinstance(e5, Member), "Bad Implementation: Class should be " \
                                                                     "swapped to Member"
@@ -626,7 +626,7 @@ def test_t4_get_highest_rated_subordinate_and_swap_up() -> None:
        """
     # Next swap_up -- e9
     e9 = e9.swap_up()
-    e7 = e9.get_employee(70)
+    e7 = e9.get_member(70)
     assert isinstance(e9, Leader) and isinstance(e7, Leader), "Bad Implementation: Both classes should still" \
                                                                         " be leader."
     assert e9.rating == 30 and e7.rating == 100, "Bad Implementation: Do not swap ratings per Piazza @824"
@@ -647,7 +647,7 @@ def test_t4_get_highest_rated_subordinate_and_swap_up() -> None:
           """
     # Next swap_up -- e3
     e3 = e3.swap_up()
-    e1 = e9.get_employee(80)
+    e1 = e9.get_member(80)
     assert isinstance(e3, Member) and isinstance(e1, Leader), "Bad Implementation: Class should be swapped " \
                                                                           "too."
     assert e3.rating == 60 and e1.rating == 80, "Bad Implementation: Do not swap ratings per Piazza @824"
@@ -667,7 +667,7 @@ def test_t4_get_highest_rated_subordinate_and_swap_up() -> None:
              """
     # Next swap_up -- e8
     e8 = e8.swap_up()
-    e4 = e9.get_employee(40)
+    e4 = e9.get_member(40)
     assert isinstance(e8, Member) and isinstance(e4, Member), "Bad Implementation: Class should not " \
                                                                             "change."
     assert e8.rating == 40 and e4.rating == 50, "Bad Implementation: Do not swap ratings per Piazza @824"
@@ -709,9 +709,9 @@ def test_t1_org___init__() -> None:
     assert o4._head == e3, "fails when the head already had a superior"
 
 
-# Test grouping get_employee and get_average_wage
-def test_t1_org_get_employee_and_average_wage() -> None:
-    # depends on get_employee of Member being correct, as tested above
+# Test grouping get_member and get_average_wage
+def test_t1_org_get_member_and_average_wage() -> None:
+    # depends on get_member of Member being correct, as tested above
     e8 = Member(1, 'emp1', 'Construction Member', 15.00, 1)
     e9 = Member(20, "Bob The Builder", 'Construction Member', 8.00, 100)
     e3 = Member(30, "Don the Doorman", 'Hospitality Member', 24.00, 100)
@@ -741,20 +741,20 @@ def test_t1_org_get_employee_and_average_wage() -> None:
     e3.become_subordinate(e5)
     # grouping Setup
     o = grouping(e7)
-    # Tests for get_employee
+    # Tests for get_member
     id_lst = [1,20,30,40,50,60,70,80,90,100]
     for eid in id_lst:
-        assert e7.get_employee(eid) == o.get_employee(eid), f"fails when searching for eid {eid}"
+        assert e7.get_member(eid) == o.get_member(eid), f"fails when searching for eid {eid}"
     # Tests for get_average_wage -- these tests are not exhaustive
     assert round(o.get_average_wage(), 4) == round(158/9, 4), "fails when None position is specified"
-    assert o.get_average_wage('Software Dev') == 0.0, "fails when <position> not in organization"
+    assert o.get_average_wage('Software Dev') == 0.0, "fails when <position> not in group"
     assert round(o.get_average_wage('Hospitality Member'), 4) == round(123 / 6, 4)
     assert round(o.get_average_wage('Construction Member'), 4) == round(23 / 2, 4)
-    assert o.get_average_wage('Big Boss') == 12.00, "fails when just 1 employee of that position is present"
+    assert o.get_average_wage('Big Boss') == 12.00, "fails when just 1 member of that position is present"
 
 
-# Test grouping add_employee
-def test_t1_org_add_employee_and_t5() -> None:
+# Test grouping add_member
+def test_t1_org_add_member_and_t5() -> None:
     e8 = Member(1, 'emp1', 'Director', 15.00, 1)
     e9 = Member(20, "Bob The Builder", 'Construction Member', 8.00, 100)
     e4 = Member(40, "Earnest the Doorman", 'Hospitality Member', 20.00, 100)
@@ -768,19 +768,19 @@ def test_t1_org_add_employee_and_t5() -> None:
      e8  e2             
     """
     o = grouping()
-    o.add_employee(e4)
+    o.add_member(e4)
     assert o._head == e4, "fails when ID was not specified and head exists already"
-    o.add_employee(e7)
+    o.add_member(e7)
     assert o._head == e7, "fails when ID was not specified and head exists already"
     assert o._head._subordinates == [e4], "fails when ID was not specified and head exists already"
     assert e4._superior == e7, "fails when ID was not specified and head exists already"
-    o.add_employee(e8, 40)
+    o.add_member(e8, 40)
     assert e4._subordinates == [e8]
     assert e8._superior == e4
-    o.add_employee(e9, 70)
-    o.add_employee(e1, 70)
+    o.add_member(e9, 70)
+    o.add_member(e1, 70)
     assert e7.get_direct_subordinates() == [e9, e4, e1]
-    o.add_employee(e2, 40)
+    o.add_member(e2, 40)
     assert e2.get_direct_subordinates() == []
     assert e2.get_superior() == e4
     # Tests for Task 5
@@ -844,7 +844,7 @@ def test_t5_dwt_create_department_wage_tree_large() -> None:
     e3.become_subordinate(e5)
     # Setup org
     o = grouping()
-    o.add_employee(e7)
+    o.add_member(e7)
     e7_copy = deepcopy(e7)
     # Check DST
     dwt = create_department_wage_tree(o)
@@ -862,13 +862,13 @@ def test_t5_dwt_create_department_wage_tree_large() -> None:
     assert dwt.subdepartments[1].subdepartments[0].wage == 8.00
     assert dwt.subdepartments[1].subdepartments[0].subdepartments == []
     # Check that grouping has not been mutated
-    assert __eq__employee(o._head, e7_copy)
+    assert __eq__member(o._head, e7_copy)
 
 
 def test_t5_dwt_create_department_wage_tree_one() -> None:
     e1 = Leader(60, "George the Toilet Cleaner", 'Chef Nottoyeur', 8.00, 100, "Sanitation Corp")
     o = grouping()
-    o.add_employee(e1)
+    o.add_member(e1)
     dwt = create_department_wage_tree(o)
     assert isinstance(dwt, DepartmentWageTree)
     assert dwt.department_name == 'Sanitation Corp'
