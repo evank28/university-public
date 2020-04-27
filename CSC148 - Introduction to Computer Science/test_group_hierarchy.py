@@ -1,6 +1,6 @@
 # Note: Code is modified to prevent
 from io import StringIO
-from organization_hierarchy import *
+from group_hierarchy import *
 import pytest
 from copy import deepcopy
 
@@ -35,7 +35,7 @@ def __eq__employee(e1: Member, e2: Member) -> bool:
 
 
 def test_no_sorted_methods() -> None:
-    file = open('organization_hierarchy.py', 'r').read()
+    file = open('group_hierarchy.py', 'r').read()
     found = file.count('.sort(') + file.count('sorted(')
     # Note that the starter code included these words in comments 4 times
     assert found <= 4, "Per instructions, 'You must NOT use list.sort() or sorted() in your code.'" \
