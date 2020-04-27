@@ -21,7 +21,7 @@ A repo storing code written for class with permissions of the instructors.
 
  
  
-##Academic Integrity
+## Academic Integrity
 Before posting code in this repo, I recieved permission from the instructor.
 I've also ensured that my code is not vulnerable to re-use, in case a student
 with a similar assignment attempts to plagiarize my work in the future. I took 3
